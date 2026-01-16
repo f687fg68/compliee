@@ -266,6 +266,7 @@ export default function App() {
                 onBack={() => navigateToView('landing')} 
                 onOpenEditor={handleOpenEditor}
                 onNavigateToPricing={() => navigateToView('pricing')}
+                onLogout={handleLogout}
                 currentUser={user}
             />
           </motion.div>

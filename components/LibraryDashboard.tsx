@@ -14,10 +14,11 @@ interface LibraryDashboardProps {
     onBack: () => void;
     onOpenEditor: (path?: string) => void;
     onNavigateToPricing: () => void;
+    onLogout: () => void;
     currentUser?: any;
 }
 
-export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, currentUser }: LibraryDashboardProps) => {
+export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, onLogout, currentUser }: LibraryDashboardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDocTitle, setNewDocTitle] = useState('');
   const [newDocColor, setNewDocColor] = useState('#4f46e5'); 
@@ -201,7 +202,7 @@ export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, cu
                         <p className="text-xs text-gray-500 truncate">Administrator</p>
                     </div>
                  </div>
-                <button onClick={onBack} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors">
+                <button onClick={onLogout} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors">
                     <LogOut size={18} /> <span className="hidden lg:block">Sign Out</span>
                 </button>
             </div>
