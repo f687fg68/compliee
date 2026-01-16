@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { BookOpen, ChevronRight, LogOut, Shield } from 'lucide-react';
+import { BookOpen, ChevronRight, LogOut, Library, Shield } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 interface NavbarProps {
@@ -18,93 +18,74 @@ export const Navbar = ({ onStartWriting, onLogin, onLogout, onNavigateToFeatures
   const { scrollY } = useScroll();
   
   // Dynamic width animation for the pill
-  const width = useTransform(scrollY, [0, 100], ["90%", "600px"]);
-  const y = useTransform(scrollY, [0, 100], [0, 0]);
+  const width = useTransform(scrollY, [0, 100], ["90%", "100%"]);
+  const y = useTransform(scrollY, [0, 100], [20, 0]);
+  const borderRadius = useTransform(scrollY, [0, 100], [24, 0]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    return scrollY.onChange((latest) => {
+      setIsScrolled(latest > 50);
+    });
+  }, [scrollY]);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none">
-      
-      <motion.nav 
-        style={{ width, y }}
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 16, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className={`pointer-events-auto h-16 rounded-full flex items-center justify-between px-2 pr-2 shadow-2xl transition-all duration-300 mt-2 ${
-          isScrolled 
-            ? 'bg-black/80 backdrop-blur-xl border border-white/10 text-white' 
-            : 'bg-white/70 backdrop-blur-lg border border-white/40 text-gray-800'
-        }`}
-      >
-        <div className="flex items-center gap-3 pl-4 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isScrolled ? 'bg-indigo-600' : 'bg-indigo-500 text-white'}`}>
-             <Shield size={16} strokeWidth={2.5} />
-          </div>
-          <span className={`font-serif font-bold tracking-tight transition-colors ${isScrolled ? 'text-white' : 'text-gray-900'}`}>Compliee</span>
-        </div>
+    <motion.nav 
+      style={{ width, y, borderRadius }}
+      className={`fixed top-0 left-0 right-0 z-50 mx-auto transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-100 h-16 rounded-none max-w-full px-6' : 'bg-transparent h-20 max-w-7xl'}`}
+    >
+      <div className={`h-full flex items-center justify-between ${isScrolled ? '' : 'px-6 bg-white/70 backdrop-blur-md rounded-3xl border border-white/40 shadow-xl shadow-gray-200/20'}`}>
+         
+         {/* Logo */}
+         <div className="flex items-center gap-2 cursor-pointer">
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+                <Shield size={16} />
+            </div>
+            <span className="font-serif font-bold text-lg text-gray-900">Compliee</span>
+         </div>
 
-        <div className="hidden md:flex items-center gap-1 bg-black/5 rounded-full p-1 mx-2">
-            <button 
-                onClick={onNavigateToFeatures}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${isScrolled ? 'text-gray-300 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-black hover:bg-white'}`}
-            >
-                Platform
-            </button>
-            <button 
-                onClick={onNavigateToHelp}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${isScrolled ? 'text-gray-300 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-black hover:bg-white'}`}
-            >
-                Resources
-            </button>
-            <button 
-                onClick={onNavigateToPricing}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${isScrolled ? 'text-gray-300 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-black hover:bg-white'}`}
-            >
-                Pricing
-            </button>
-        </div>
+         {/* Navigation Links (Hidden on mobile) */}
+         <div className="hidden md:flex items-center gap-6">
+             <button onClick={onNavigateToFeatures} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</button>
+             <button onClick={onNavigateToPricing} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Pricing</button>
+             <button onClick={onNavigateToHelp} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Help Center</button>
+         </div>
 
-        <div className="flex items-center gap-2">
-          {user ? (
-             <div className="flex items-center gap-3">
-                 <span className={`hidden md:block text-xs font-medium ${isScrolled ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {user.username}
-                 </span>
-                 <button 
-                    onClick={onLogout}
-                    className={`p-2 rounded-full transition-colors ${isScrolled ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-gray-200 text-gray-600'}`}
-                    title="Sign Out"
-                 >
-                    <LogOut size={16} />
-                 </button>
-             </div>
-          ) : (
-            <button 
-                onClick={onLogin} 
-                className={`hidden md:block text-xs font-medium px-4 py-2 transition-colors ${isScrolled ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}
-            >
-                Log in
-            </button>
-          )}
-          
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={onStartWriting}
-            className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-5 py-2.5 rounded-full hover:shadow-lg hover:shadow-indigo-500/30 transition-all font-medium text-xs"
-          >
-            <span>Dashboard</span>
-            <ChevronRight size={12} />
-          </motion.button>
-        </div>
-      </motion.nav>
-    </div>
+         {/* Action Buttons */}
+         <div className="flex items-center gap-3">
+             {user ? (
+                 <div className="flex items-center gap-3">
+                     <div className="text-right hidden sm:block">
+                         <p className="text-xs font-bold text-gray-900">{user.username}</p>
+                         <p className="text-[10px] text-gray-500">Pro Plan</p>
+                     </div>
+                     <button onClick={onLogout} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-red-600 transition-colors" title="Sign Out">
+                         <LogOut size={18} />
+                     </button>
+                     <button 
+                        onClick={onStartWriting}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2"
+                     >
+                        <Library size={16} />
+                        <span>Dashboard</span>
+                     </button>
+                 </div>
+             ) : (
+                 <>
+                    <button onClick={onLogin} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-3 py-2">
+                        Sign In
+                    </button>
+                    <button 
+                        onClick={onStartWriting}
+                        className="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-lg shadow-gray-200 transition-all flex items-center gap-2"
+                    >
+                        <span>Start Writing</span>
+                        <ChevronRight size={14} />
+                    </button>
+                 </>
+             )}
+         </div>
+
+      </div>
+    </motion.nav>
   );
 };

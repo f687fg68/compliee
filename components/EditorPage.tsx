@@ -14,6 +14,7 @@ import { SUBSCRIPTION_FILE } from '../App';
 declare const Quill: any;
 declare const puter: any;
 declare const html2pdf: any;
+declare const pdfjsLib: any;
 
 interface EditorPageProps {
     onBack: () => void;
@@ -80,19 +81,15 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
 
   const checkStrictAccess = async () => {
       setIsCheckingAccess(true);
-      // If no user, they definitely aren't allowed
       if (!currentUser) {
           setIsAccessDenied(true);
           setIsCheckingAccess(false);
           return;
       }
       try {
-          // Check for a subscription marker file in the user's filesystem
           await puter.fs.stat(SUBSCRIPTION_FILE);
-          // If succeeds, access granted.
           setIsAccessDenied(false);
       } catch (e) {
-          // If fails, strict block.
           setIsAccessDenied(true);
       } finally {
           setIsCheckingAccess(false);
@@ -101,8 +98,6 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
 
   const initQuill = () => {
     if (!editorRef.current) return;
-    
-    // Prevent double init
     if (quillRef.current) return;
     
     const quill = new Quill(editorRef.current, {
@@ -186,19 +181,16 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
     };
 
     element.classList.add('exporting-pdf');
-    
     html2pdf().set(opt).from(element).save().then(() => {
         element.classList.remove('exporting-pdf');
     }).catch((err: any) => {
         console.error("PDF Export failed", err);
         alert("Could not generate PDF. Please try again.");
     }).finally(() => {
-        // Ensure class is removed even if error
         element.classList.remove('exporting-pdf');
     });
   };
 
-  // Editor Operations
   const format = (fmt: string, value: any = true) => {
       if(quillRef.current) {
           quillRef.current.format(fmt, value);
@@ -256,18 +248,57 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
     }
   };
 
+  // Helper to extract text from file
+  const extractFileContent = async (file: File): Promise<string> => {
+      if (file.type === 'application/pdf') {
+          if (!pdfjsLib) return "[PDF Library not loaded]";
+          try {
+             const arrayBuffer = await file.arrayBuffer();
+             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+             let fullText = '';
+             // Limit to first 20 pages to avoid overload
+             const maxPages = Math.min(pdf.numPages, 20);
+             for (let i = 1; i <= maxPages; i++) {
+                 const page = await pdf.getPage(i);
+                 const textContent = await page.getTextContent();
+                 const pageText = textContent.items.map((item: any) => item.str).join(' ');
+                 fullText += `\n--- Page ${i} ---\n${pageText}`;
+             }
+             return fullText;
+          } catch (e) {
+              console.error("PDF Parse Error", e);
+              return "Error extracting PDF text.";
+          }
+      } else if (file.type.startsWith('image/')) {
+          // Placeholder for images
+          return `[Image File: ${file.name} - Visual content extraction requires vision model]`;
+      } else {
+          // Try text
+          return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = (e) => resolve(e.target?.result as string);
+              reader.onerror = () => resolve("[Error reading text file]");
+              reader.readAsText(file);
+          });
+      }
+  };
+
   const handleAiChatSubmit = async () => {
       if (!quillRef.current || (!aiPrompt.trim() && !attachedFile)) return;
       
+      setIsAiChatOpen(false);
+      setIsAiLoading(true);
+      
       let promptToSend = aiPrompt;
+      let extractedContent = '';
+
       if (attachedFile) {
-        promptToSend += `\n[Attached File: ${attachedFile.name}]`;
+          extractedContent = await extractFileContent(attachedFile);
+          promptToSend += `\n\n=== ATTACHED FILE: ${attachedFile.name} ===\n${extractedContent}\n=== END ATTACHMENT ===\n`;
       }
 
       setAiPrompt('');
       setAttachedFile(null);
-      setIsAiChatOpen(false);
-      setIsAiLoading(true);
       
       try {
         const text = quillRef.current.getText();
@@ -275,25 +306,41 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
         
         const systemPrompt = `YOU ARE COMPLIEE, AN ELITE COMPLIANCE WRITING ASSISTANT.
         CONTEXT (Last 3000 chars): "...${context}"
+        
         USER INSTRUCTION: "${promptToSend}"
         
-        TASK: Generate HTML content for the document.
+        TASK: Generate a MASSIVE, DETAILED COMPLIANCE BOOK OR DOCUMENT (Minimum 10 pages).
         
-        CRITICAL RULES:
-        1. If the content is long (over 400 words), you MUST break it into pages.
-        2. To create a new page, insert the exact delimiter: [[PAGE_BREAK]]
-        3. Do not assume the user wants one long block of text. Use [[PAGE_BREAK]] to separate chapters, distinct sections, or when a topic shift occurs.
-        4. Return raw HTML body. No markdown code blocks.
-        5. Use <h2> for section headers.
+        CRITICAL RULES FOR GENERATION:
+        1. MASSIVE EXPANSION: Do not summarize. Write in extreme detail. If the user asks for a policy, include:
+           - Detailed Purpose & Scope (500+ words)
+           - Definitions (Extensive list)
+           - Roles & Responsibilities (Detailed matrix)
+           - Procedural Steps (Step-by-step with sub-steps)
+           - Enforcement & Exceptions
+           - References (ISO, SOC2, GDPR, etc.)
+        2. PAGINATION: You MUST structure this as a multi-chapter book. Insert the delimiter [[PAGE_BREAK]] frequently to create at least 10 distinct pages/sections.
+        3. STRUCTURE:
+           - Chapter 1: Introduction
+           - [[PAGE_BREAK]]
+           - Chapter 2: Governance Structure
+           - [[PAGE_BREAK]]
+           - Chapter 3: ... (and so on up to 10+ chapters/pages)
+        4. CONTENT QUALITY: Use formal, authoritative, and audit-ready language.
+        5. FORMAT: Return raw HTML body. No markdown code blocks. Use <h2> for Chapter Titles, <h3> for Sections.
         `;
         
-        const response = await puter.ai.chat(systemPrompt, { model: 'gemini-3-pro-preview' });
+        const response = await puter.ai.chat(systemPrompt, { 
+            model: 'gemini-3-pro-preview',
+            config: {
+                thinkingConfig: { thinkingBudget: 2048 } 
+            }
+        });
         const content = response?.message?.content || response?.text || ""; 
         
         if (content) {
             const selection = quillRef.current.getSelection(true) || { index: quillRef.current.getLength() };
             let cleanContent = content.replace(/^```html\s*/i, '').replace(/\s*```$/, '');
-            
             cleanContent = cleanContent.replace(/\[\[PAGE_BREAK\]\]/g, '<hr class="page-break">');
 
             quillRef.current.clipboard.dangerouslyPasteHTML(selection.index, cleanContent);
@@ -304,6 +351,7 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
         }
       } catch (err) {
           console.error(err);
+          alert("AI generation failed. Please try again.");
       } finally {
           setIsAiLoading(false);
       }
@@ -323,7 +371,6 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
   return (
     <div className="flex flex-col h-screen w-full bg-[#F3F4F6] text-gray-900 font-sans overflow-hidden">
         
-        {/* Strict Access Blocking Modal */}
         <AnimatePresence>
             {isAccessDenied && (
                 <motion.div 
@@ -355,6 +402,28 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
                 </motion.div>
             )}
         </AnimatePresence>
+        
+        {/* Loading Overlay for AI */}
+        <AnimatePresence>
+            {isAiLoading && (
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[60] bg-white/80 backdrop-blur-sm flex items-center justify-center pointer-events-none"
+                >
+                     <div className="flex flex-col items-center gap-4">
+                        <div className="w-16 h-16 relative">
+                             <div className="absolute inset-0 border-4 border-indigo-200 rounded-full"></div>
+                             <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+                             <Bot className="absolute inset-0 m-auto text-indigo-600" size={24} />
+                        </div>
+                        <p className="text-lg font-bold text-gray-800 animate-pulse">Drafting Compliance Document...</p>
+                        <p className="text-sm text-gray-500">Reading context & attached files</p>
+                     </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
 
         <input type="file" ref={fileInputRef} onChange={(e) => e.target.files && setAttachedFile(e.target.files[0])} className="hidden" accept="image/*,.pdf,.txt,.md" />
 
@@ -365,7 +434,6 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
           transition={{ duration: 0.3 }}
           className="shrink-0 h-16 flex items-center justify-between px-6 z-40 bg-white border-b border-gray-200"
         >
-             {/* Left side: Back, Title, Word count */}
              <div className="flex items-center gap-4">
                  <button onClick={() => { saveDocument(); onBack(); }} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
                     <ArrowLeft size={20} />
@@ -388,7 +456,6 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
                  </div>
             </div>
 
-            {/* Right side: Actions */}
             <div className="flex items-center gap-2">
                  <button onClick={handleExportPdf} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors" title="Export as PDF">
                     <Download size={20} />
@@ -500,7 +567,7 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
                                 {attachedFile && (
                                     <div className="px-4 pt-3 flex"><div className="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded-md flex items-center gap-2 border border-indigo-100"><Paperclip size={12} /><span className="max-w-[200px] truncate">{attachedFile.name}</span><button onClick={() => setAttachedFile(null)} className="hover:text-indigo-900"><X size={12}/></button></div></div>
                                 )}
-                                <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAiChatSubmit()} placeholder="Ask Compliee to draft a policy or audit report..." className="w-full bg-transparent p-4 pb-12 text-sm outline-none resize-none h-32 text-gray-700 placeholder:text-gray-400 font-medium" autoFocus />
+                                <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAiChatSubmit()} placeholder="Ask Compliee to draft a policy, check regulations, or read attached files..." className="w-full bg-transparent p-4 pb-12 text-sm outline-none resize-none h-32 text-gray-700 placeholder:text-gray-400 font-medium" autoFocus />
                                 <div className="absolute bottom-2 left-2 flex gap-2"><button onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors"><Paperclip size={18} /></button></div>
                                 <button onClick={handleAiChatSubmit} disabled={!aiPrompt.trim() && !attachedFile} className="absolute bottom-3 right-3 p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"><ArrowUp size={16} /></button>
                              </div>
