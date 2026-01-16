@@ -15,6 +15,7 @@ import { TermsOfServicePage } from './components/TermsOfServicePage';
 import { SecurityPage } from './components/SecurityPage';
 import { LoginPage } from './components/LoginPage';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 
 declare const puter: any;
 
@@ -29,8 +30,23 @@ export default function App() {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   useEffect(() => {
-    // Initial Auth Check
+    // Initial Auth Check with Library Wait Logic
     const checkAuth = async () => {
+      // 1. Wait for Puter.js to load (Crucial for Vercel/Production)
+      let attempts = 0;
+      while (typeof (window as any).puter === 'undefined' && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+      }
+
+      // 2. If still not loaded, stop checking but don't crash
+      if (typeof (window as any).puter === 'undefined') {
+          console.error("Puter.js failed to initialize. Please check your internet connection.");
+          setIsAuthChecking(false);
+          return;
+      }
+
+      // 3. Safe to use puter now
       try {
         if (puter.auth.isSignedIn()) {
           const userData = await puter.auth.getUser();
@@ -43,7 +59,7 @@ export default function App() {
           }
         }
       } catch (e) {
-        console.log("Not signed in");
+        console.log("Not signed in or auth error", e);
       } finally {
         setIsAuthChecking(false);
       }
@@ -116,9 +132,9 @@ export default function App() {
   if (isAuthChecking) {
      return (
        <div className="h-screen w-full flex items-center justify-center bg-gray-50">
-          <div className="animate-pulse flex flex-col items-center gap-4">
-             <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-             <div className="h-4 w-32 bg-gray-200 rounded"></div>
+          <div className="flex flex-col items-center gap-4 text-indigo-600">
+             <Loader2 size={40} className="animate-spin" />
+             <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
           </div>
        </div>
      );
