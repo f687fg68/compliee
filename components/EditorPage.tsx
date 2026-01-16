@@ -41,7 +41,7 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
   const saveTimeoutRef = useRef<any>(null);
   
   // Editor State
-  const [docTitle, setDocTitle] = useState('Untitled Book');
+  const [docTitle, setDocTitle] = useState('Untitled Document');
   const [isSaving, setIsSaving] = useState(false);
   const [wordCount, setWordCount] = useState(0);
 
@@ -491,7 +491,7 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
                         <div className="p-4 border-b border-gray-100/50 flex justify-between items-center">
                             <div className="flex items-center gap-2">
                                 <Wand2 size={16} className="text-indigo-600" />
-                                <span className="text-sm font-bold text-gray-800">Brookie Book Engine</span>
+                                <span className="text-sm font-bold text-gray-800">Compliee Assistant</span>
                             </div>
                             <button onClick={() => setIsAiChatOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={16}/></button>
                         </div>
@@ -500,7 +500,7 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
                                 {attachedFile && (
                                     <div className="px-4 pt-3 flex"><div className="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded-md flex items-center gap-2 border border-indigo-100"><Paperclip size={12} /><span className="max-w-[200px] truncate">{attachedFile.name}</span><button onClick={() => setAttachedFile(null)} className="hover:text-indigo-900"><X size={12}/></button></div></div>
                                 )}
-                                <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAiChatSubmit()} placeholder="Write a chapter about..." className="w-full bg-transparent p-4 pb-12 text-sm outline-none resize-none h-32 text-gray-700 placeholder:text-gray-400 font-medium" autoFocus />
+                                <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAiChatSubmit()} placeholder="Ask Compliee to draft a policy or audit report..." className="w-full bg-transparent p-4 pb-12 text-sm outline-none resize-none h-32 text-gray-700 placeholder:text-gray-400 font-medium" autoFocus />
                                 <div className="absolute bottom-2 left-2 flex gap-2"><button onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors"><Paperclip size={18} /></button></div>
                                 <button onClick={handleAiChatSubmit} disabled={!aiPrompt.trim() && !attachedFile} className="absolute bottom-3 right-3 p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"><ArrowUp size={16} /></button>
                              </div>

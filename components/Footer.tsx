@@ -22,7 +22,8 @@ export const Footer = ({ onNavigateToPrivacy, onNavigateToTerms, onNavigateToSec
                      <span className="text-xl font-serif font-bold text-gray-900">Compliee</span>
                 </div>
                 <p className="text-gray-500 leading-relaxed mb-6">
-                    The intelligent engine for modern compliance teams. Automated document drafting, risk mapping, and audit assurance.
+                    The governance operating system for modern enterprises. 
+                    Draft, audit, and monitor compliance in one unified workspace.
                 </p>
             </div>
 

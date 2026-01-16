@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { BookOpen, ChevronRight, LogOut, Shield } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -99,7 +100,7 @@ export const Navbar = ({ onStartWriting, onLogin, onLogout, onNavigateToFeatures
             onClick={onStartWriting}
             className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-5 py-2.5 rounded-full hover:shadow-lg hover:shadow-indigo-500/30 transition-all font-medium text-xs"
           >
-            <span>{user ? 'Dashboard' : 'Start Compliance'}</span>
+            <span>Dashboard</span>
             <ChevronRight size={12} />
           </motion.button>
         </div>

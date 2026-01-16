@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Sparkles, ChevronDown, Wand2, Shield, Lock, FileText, CheckCircle, Search } from 'lucide-react';
@@ -16,11 +17,11 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
   return (
     <div className="relative w-full min-h-[120vh] bg-gray-50 overflow-hidden">
       
-      {/* Dynamic Aurora Background - Professional Blue Tones */}
+      {/* Background Gradients */}
       <div className="absolute inset-0 z-0">
-         <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-blue-200/30 rounded-full blur-[120px] mix-blend-multiply animate-pulse" />
-         <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-indigo-200/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse" style={{ animationDelay: "2s" }} />
-         <div className="absolute bottom-[20%] left-[20%] w-[50vw] h-[50vw] bg-cyan-100/30 rounded-full blur-[120px] mix-blend-multiply" />
+         <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-indigo-200/30 rounded-full blur-[120px] mix-blend-multiply animate-pulse" />
+         <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-blue-200/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse" style={{ animationDelay: "2s" }} />
+         <div className="absolute bottom-[20%] left-[20%] w-[50vw] h-[50vw] bg-purple-100/30 rounded-full blur-[120px] mix-blend-multiply" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 flex flex-col items-center pt-48">
@@ -35,7 +36,7 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
           <span className="flex items-center justify-center w-5 h-5 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full text-white shadow-inner">
             <Shield size={10} />
           </span>
-          <span className="text-gray-600 font-medium text-xs tracking-wide">Compliee 2.0 <span className="text-gray-400 mx-1">|</span> AI Governance Engine</span>
+          <span className="text-gray-600 font-medium text-xs tracking-wide">Compliee 2.0 <span className="text-gray-400 mx-1">|</span> SOC 2 Ready</span>
           <ChevronDown size={12} className="text-gray-400 group-hover:translate-y-0.5 transition-transform" />
         </motion.div>
 
@@ -46,10 +47,10 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-5xl md:text-7xl lg:text-8xl text-center font-serif leading-[0.95] text-gray-900 tracking-tighter mb-8 relative"
         >
-          <span className="relative inline-block z-10">Regulatory writing</span>
+          <span className="relative inline-block z-10">Compliance writing</span>
           <br/>
           <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-b from-indigo-600 to-blue-800 z-10 pb-4">
-             on autopilot.
+             reimagined.
           </span>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-white/50 blur-3xl -z-10" />
         </motion.h1>
@@ -60,7 +61,7 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-gray-600 text-xl md:text-2xl text-center max-w-xl font-light leading-relaxed mb-16"
         >
-          The intelligent co-pilot that drafts policies, audits controls, and tracks legislation changes for modern compliance teams.
+          The intelligent operating system that automates policy drafting, maps controls, and tracks regulatory changes for modern enterprises.
         </motion.p>
 
         {/* Hero Interactive Input */}
@@ -70,14 +71,14 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="w-full max-w-2xl relative z-20 group"
         >
-          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-400 via-blue-400 to-indigo-400 rounded-3xl opacity-30 blur-lg group-hover:opacity-50 transition-opacity duration-500 animate-gradient-x"></div>
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400 rounded-3xl opacity-30 blur-lg group-hover:opacity-50 transition-opacity duration-500 animate-gradient-x"></div>
           <div className="relative glass-panel bg-white/80 rounded-2xl p-2 shadow-2xl shadow-indigo-900/10 backdrop-blur-xl border border-white/60">
              <div className="flex flex-col md:flex-row gap-2">
                 <div className="flex-1 relative">
                     <Sparkles className="absolute top-4 left-4 text-indigo-500 animate-pulse" size={20} />
                     <input 
                       type="text" 
-                      placeholder="Draft a data retention policy for GDPR..." 
+                      placeholder="Draft a Data Retention Policy for GDPR..." 
                       className="w-full h-full min-h-[60px] pl-12 pr-4 bg-transparent outline-none text-lg text-gray-800 placeholder:text-gray-400 font-serif"
                     />
                 </div>
@@ -92,8 +93,8 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
              
              {/* Micro-interaction tags */}
              <div className="hidden md:flex gap-2 px-4 pb-2 pt-2">
-                <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold py-1">Frameworks:</span>
-                {['SOC 2', 'ISO 27001', 'HIPAA', 'GDPR'].map(tag => (
+                <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold py-1">Suggested:</span>
+                {['SOC 2 Type II', 'ISO 27001', 'HIPAA', 'GDPR'].map(tag => (
                     <button key={tag} className="text-xs text-gray-500 bg-gray-100/50 hover:bg-indigo-50 hover:text-indigo-600 px-2 py-1 rounded-md border border-transparent hover:border-indigo-100 transition-colors">
                         {tag}
                     </button>
@@ -102,7 +103,7 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
           </div>
         </motion.div>
 
-        {/* Floating Element Left (Compliance Score) */}
+        {/* Floating Element Left */}
         <motion.div 
           style={{ y: y1, rotate: rotate1 }}
           className="absolute top-1/3 left-[5%] xl:left-[10%] hidden lg:block"
@@ -113,27 +114,27 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
                    <Shield size={20} className="text-green-600" />
                 </div>
                 <div>
-                   <h4 className="font-bold text-gray-800 text-sm">Audit Readiness</h4>
-                   <p className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full inline-block mt-0.5">Passing</p>
+                   <h4 className="font-bold text-gray-800 text-sm">Security Audit</h4>
+                   <p className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full inline-block mt-0.5">Passed</p>
                 </div>
              </div>
              <div className="space-y-2">
                 <div className="flex justify-between items-center text-xs text-gray-500">
                     <span>Control Coverage</span>
-                    <span className="font-bold text-gray-900">92%</span>
+                    <span className="font-bold text-gray-900">94%</span>
                 </div>
                 <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full w-[92%] bg-green-500 rounded-full" />
+                    <div className="h-full w-[94%] bg-green-500 rounded-full" />
                 </div>
                 <div className="flex justify-between text-[10px] text-gray-400 font-medium">
-                    <span>Gap Analysis</span>
-                    <span>2 Low Risks</span>
+                    <span>SOC 2 (CC6.1)</span>
+                    <span>Verified</span>
                 </div>
              </div>
           </div>
         </motion.div>
 
-        {/* Floating Element Right (Document Status) */}
+        {/* Floating Element Right */}
         <motion.div 
           style={{ y: y2, rotate: rotate2 }}
           className="absolute top-1/4 right-[5%] xl:right-[10%] hidden lg:block"
@@ -141,9 +142,9 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
           <div className="w-60 bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,255,0.15)] p-6 border border-white/60 relative overflow-hidden">
              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
              <div className="flex justify-between items-center mb-4">
-                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Draft</span>
+                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Policy</span>
                  <div className="flex items-center gap-1 text-[10px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full font-bold">
-                    <Wand2 size={8} /> AI Active
+                    <Lock size={8} /> Confidential
                  </div>
              </div>
              
@@ -158,8 +159,8 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
                     <FileText size={14} />
                 </div>
                 <div>
-                    <div className="text-xs font-bold text-gray-700">Access Policy</div>
-                    <div className="text-[10px] text-gray-400">SOC 2 • CC 6.1</div>
+                    <div className="text-xs font-bold text-gray-700">Access Control</div>
+                    <div className="text-[10px] text-gray-400">ISO 27001 • A.9</div>
                 </div>
                 <div className="ml-auto text-green-500">
                     <CheckCircle size={14} />
