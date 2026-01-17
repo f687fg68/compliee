@@ -309,31 +309,34 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
         
         USER INSTRUCTION: "${promptToSend}"
         
-        TASK: Generate a MASSIVE, DETAILED COMPLIANCE BOOK OR DOCUMENT (Minimum 10 pages).
+        TASK: Generate a MASSIVE, EXTREMELY DETAILED COMPLIANCE BOOK (Minimum 20 pages).
         
         CRITICAL RULES FOR GENERATION:
-        1. MASSIVE EXPANSION: Do not summarize. Write in extreme detail. If the user asks for a policy, include:
-           - Detailed Purpose & Scope (500+ words)
-           - Definitions (Extensive list)
-           - Roles & Responsibilities (Detailed matrix)
-           - Procedural Steps (Step-by-step with sub-steps)
-           - Enforcement & Exceptions
-           - References (ISO, SOC2, GDPR, etc.)
-        2. PAGINATION: You MUST structure this as a multi-chapter book. Insert the delimiter [[PAGE_BREAK]] frequently to create at least 10 distinct pages/sections.
+        1. EXTREME LENGTH & DEPTH: Do not summarize. Write in exhaustive detail.
+           - Every section must be expanded to its maximum logical extent.
+           - Purpose & Scope: 800+ words.
+           - Definitions: List at least 30 terms with full definitions.
+           - Roles & Responsibilities: Detailed matrix of 10+ roles with specific duties.
+           - Procedural Steps: Step-by-step workflows with 15+ sub-steps each.
+           - Compliance Mappings: Detailed mapping to SOC2 (all criteria), ISO 27001 (all controls), GDPR, HIPAA, NIST.
+        2. PAGINATION: You MUST structure this as a multi-chapter book. Insert the delimiter [[PAGE_BREAK]] frequently to create at least 20 distinct pages.
+           - Ensure there is enough content between page breaks to justify a full page.
         3. STRUCTURE:
-           - Chapter 1: Introduction
+           - Chapter 1: Introduction, Scope, & Governance
            - [[PAGE_BREAK]]
-           - Chapter 2: Governance Structure
+           - Chapter 2: Detailed Policy Statements (Data Protection, Access Control, etc.)
            - [[PAGE_BREAK]]
-           - Chapter 3: ... (and so on up to 10+ chapters/pages)
-        4. CONTENT QUALITY: Use formal, authoritative, and audit-ready language.
+           - Chapter 3: Operational Procedures & Workflows
+           - [[PAGE_BREAK]]
+           - ... (Continue until at least Chapter 20 / Page 20)
+        4. TONE: Use formal, authoritative, and audit-ready language (Legal/Technical English).
         5. FORMAT: Return raw HTML body. No markdown code blocks. Use <h2> for Chapter Titles, <h3> for Sections.
         `;
         
         const response = await puter.ai.chat(systemPrompt, { 
             model: 'gemini-3-pro-preview',
             config: {
-                thinkingConfig: { thinkingBudget: 2048 } 
+                thinkingConfig: { thinkingBudget: 4096 } 
             }
         });
         const content = response?.message?.content || response?.text || ""; 
@@ -412,14 +415,19 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 z-[60] bg-white/80 backdrop-blur-sm flex items-center justify-center pointer-events-none"
                 >
-                     <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 relative">
+                     <div className="flex flex-col items-center gap-4 p-8 bg-white/50 backdrop-blur-md rounded-3xl shadow-xl max-w-lg text-center">
+                        <div className="w-16 h-16 relative mb-4">
                              <div className="absolute inset-0 border-4 border-indigo-200 rounded-full"></div>
                              <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
                              <Bot className="absolute inset-0 m-auto text-indigo-600" size={24} />
                         </div>
-                        <p className="text-lg font-bold text-gray-800 animate-pulse">Drafting Compliance Document...</p>
-                        <p className="text-sm text-gray-500">Reading context & attached files</p>
+                        <h3 className="text-xl font-serif font-bold text-gray-900">Constructing Compliance Framework</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed font-medium">
+                            Our AI is synthesizing a detailed, 20+ page manuscript tailored to your specifications.
+                        </p>
+                        <p className="text-xs text-gray-500 max-w-xs mx-auto">
+                            Please remain patient. We prioritize depth, accuracy, and regulatory alignment over speed to ensure an audit-ready result. This may take a few minutes.
+                        </p>
                      </div>
                 </motion.div>
             )}
