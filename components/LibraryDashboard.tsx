@@ -151,13 +151,10 @@ export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, on
   ];
 
   return (
-    <div className="flex h-screen w-full bg-[#F3F4F6] overflow-hidden font-sans text-gray-900 relative selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="flex h-screen w-full bg-[#E5E5E5] overflow-hidden font-sans text-gray-900 relative selection:bg-indigo-100 selection:text-indigo-900">
       
-      {/* Background Ambience */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-         <div className="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-200/40 rounded-full blur-[120px] mix-blend-multiply opacity-70" />
-         <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply opacity-70" />
-      </div>
+      {/* Background Texture/Ambience */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
       <AnimatePresence>
         {isModalOpen && (
@@ -179,21 +176,21 @@ export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, on
         animate={{ x: 0, opacity: 1 }}
         className="w-20 lg:w-72 h-full flex flex-col p-4 relative z-20"
       >
-        <div className="h-full bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-3xl flex flex-col p-6">
+        <div className="h-full bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl rounded-3xl flex flex-col p-6">
             <div className="flex items-center gap-3 mb-12 px-2 cursor-pointer group" onClick={onBack}>
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                     <Shield size={20} />
                 </div>
                 <span className="hidden lg:block font-serif font-bold text-xl text-gray-900 tracking-tight">Compliee</span>
             </div>
 
             <div className="space-y-2 flex-1">
-                <p className="hidden lg:block text-xs font-bold text-gray-400 uppercase tracking-wider px-4 mb-2">Workspace</p>
-                <SidebarItem icon={Layout} label="Dashboard" active />
+                <p className="hidden lg:block text-xs font-bold text-gray-400 uppercase tracking-wider px-4 mb-2">Library</p>
+                <SidebarItem icon={Layout} label="All Books" active />
             </div>
 
             <div className="mt-auto">
-                 <div className="hidden lg:flex items-center gap-3 p-3 bg-white/50 rounded-xl border border-gray-100 mb-4">
+                 <div className="hidden lg:flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 mb-4">
                     <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
                         {currentUser?.username?.[0]?.toUpperCase() || 'U'}
                     </div>
@@ -214,18 +211,20 @@ export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, on
         
         {/* Minimal Toolbar */}
         <div className="h-20 px-8 flex items-center justify-between">
-            <div></div> {/* Spacer */}
+            <div>
+                 <h1 className="text-2xl font-serif font-bold text-gray-900">My Bookshelf</h1>
+            </div>
             <div className="flex items-center gap-4">
-                <div className="flex bg-white/50 rounded-lg p-1 border border-white/20">
+                <div className="flex bg-white/50 rounded-lg p-1 border border-white/20 shadow-sm">
                     <button 
                         onClick={() => setViewMode('grid')}
-                        className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:bg-gray-100/50'}`}
+                        className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:bg-gray-100/50'}`}
                     >
                         <Grid size={18} />
                     </button>
                     <button 
                         onClick={() => setViewMode('list')}
-                        className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:bg-gray-100/50'}`}
+                        className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:bg-gray-100/50'}`}
                     >
                         <ListIcon size={18} />
                     </button>
@@ -233,7 +232,7 @@ export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, on
                 
                 <button 
                     onClick={handleCreateClick}
-                    className="w-10 h-10 bg-gray-900 hover:bg-black text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 group"
+                    className="w-10 h-10 bg-black hover:bg-gray-800 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 group"
                     title="Create New Policy"
                 >
                     <Plus size={20} className="group-hover:rotate-90 transition-transform" />
@@ -246,20 +245,20 @@ export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, on
             
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-                    <Loader2 size={32} className="animate-spin mb-4 text-indigo-500" />
-                    <p>Syncing library...</p>
+                    <Loader2 size={32} className="animate-spin mb-4 text-gray-500" />
+                    <p>Fetching library...</p>
                 </div>
             ) : documents.length === 0 ? (
-                 <div className="flex flex-col items-center justify-center h-64 text-gray-400 bg-white/30 rounded-3xl border border-dashed border-gray-300">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                        <FileText size={32} className="opacity-50"/>
+                 <div className="flex flex-col items-center justify-center h-64 text-gray-400 bg-white/40 backdrop-blur-sm rounded-3xl border border-dashed border-gray-300">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <Book size={32} className="opacity-50 text-gray-600"/>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900">No documents found</h3>
-                    <p className="mb-6 text-sm">Create a new policy to get started with your compliance journey.</p>
-                    <button onClick={handleCreateClick} className="text-indigo-600 font-medium hover:underline">Create Document</button>
+                    <h3 className="text-lg font-bold text-gray-900">No books found</h3>
+                    <p className="mb-6 text-sm">Draft your first compliance book.</p>
+                    <button onClick={handleCreateClick} className="text-indigo-600 font-bold hover:underline">Create Book</button>
                 </div>
             ) : (
-                <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "space-y-3"}>
+                <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" : "space-y-3"}>
                     <AnimatePresence>
                         {documents.map((doc) => (
                             <DocCard 
@@ -280,10 +279,10 @@ export const LibraryDashboard = ({ onBack, onOpenEditor, onNavigateToPricing, on
 };
 
 const SidebarItem = ({ icon: Icon, label, active }: any) => (
-    <div className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-indigo-50/80 text-indigo-700 shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}>
-        <Icon size={20} className={active ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600'} />
-        <span className="hidden lg:block font-medium text-sm">{label}</span>
-        {active && <div className="hidden lg:block ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500" />}
+    <div className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-gray-100 text-black font-bold shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}>
+        <Icon size={20} className={active ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'} />
+        <span className="hidden lg:block text-sm">{label}</span>
+        {active && <div className="hidden lg:block ml-auto w-1.5 h-1.5 rounded-full bg-black" />}
     </div>
 );
 
@@ -302,24 +301,15 @@ const DocCard = ({ doc, viewMode, onClick, onDelete }: any) => {
                 className="group flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer"
             >
                 <div className={`w-10 h-10 rounded-lg shrink-0 flex items-center justify-center border shadow-sm`} style={{ backgroundColor: doc.color, borderColor: isDark ? 'transparent' : '#e5e7eb' }}>
-                    <FileText size={20} className={isDark ? 'text-white/80' : 'text-gray-400'} />
+                    <Book size={20} className={isDark ? 'text-white/80' : 'text-gray-400'} />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-gray-900 truncate">{doc.title}</h4>
+                    <h4 className="font-bold text-gray-900 truncate font-serif">{doc.title}</h4>
                     <p className="text-xs text-gray-500 flex items-center gap-2">
                         <span>Updated {doc.updated}</span> • <span>{doc.author}</span>
                     </p>
                 </div>
                 <div className="flex items-center gap-6 mr-4">
-                    <div className="w-24">
-                        <div className="flex justify-between text-[10px] mb-1 text-gray-400">
-                             <span>Health</span>
-                             <span>{doc.score}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                             <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${doc.score}%` }} />
-                        </div>
-                    </div>
                     <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${statusColor}`}>
                         {doc.status}
                     </span>
@@ -338,63 +328,47 @@ const DocCard = ({ doc, viewMode, onClick, onDelete }: any) => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             onClick={onClick}
-            whileHover={{ y: -5 }}
-            className="group relative cursor-pointer bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden aspect-[4/5]"
+            whileHover={{ y: -8, rotateX: 2 }}
+            className="group relative cursor-pointer flex flex-col perspective-1000"
         >
-            <div 
-                className="h-2/5 p-5 relative flex flex-col justify-between transition-colors"
-                style={{ backgroundColor: doc.color }}
-            >
-                <div className="flex justify-between items-start">
-                    <div className={`p-2 rounded-lg backdrop-blur-md ${isDark ? 'bg-white/20 text-white' : 'bg-white/60 text-gray-500'}`}>
-                        <Book size={16} />
-                    </div>
-                    <button 
-                        onClick={onDelete}
-                        className={`p-2 rounded-lg backdrop-blur-md transition-opacity opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white ${isDark ? 'bg-black/20 text-white' : 'bg-gray-100 text-gray-500'}`}
-                    >
-                        <Trash2 size={14} />
-                    </button>
+            {/* Book Cover Effect */}
+            <div className="relative aspect-[3/4] rounded-r-2xl rounded-l-sm shadow-xl transition-all duration-300 overflow-hidden border-l-4 border-l-black/10">
+                {/* Dynamic Background Color */}
+                <div className="absolute inset-0 transition-colors" style={{ backgroundColor: doc.color }}>
+                     {/* Paper Texture Overlay */}
+                     {doc.color === '#ffffff' && <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>}
                 </div>
-                {isDark && <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />}
-            </div>
 
-            <div className="flex-1 p-5 flex flex-col justify-between bg-white relative">
-                 <div className="-mt-10 mb-2">
-                     <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100/50">
-                        <h3 className="font-serif font-bold text-lg text-gray-900 line-clamp-2 leading-tight mb-1">
+                {/* Spine Highlight */}
+                <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-r from-black/20 to-transparent z-10"></div>
+                
+                {/* Cover Content */}
+                <div className="relative z-20 h-full p-6 flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                        <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] font-bold ${isDark ? 'border-white/30 text-white' : 'border-black/10 text-black'}`}>
+                            {doc.author[0]}
+                        </div>
+                         <button 
+                            onClick={onDelete}
+                            className={`p-1.5 rounded-md backdrop-blur-md transition-opacity opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white ${isDark ? 'bg-black/20 text-white' : 'bg-gray-100 text-gray-500'}`}
+                        >
+                            <Trash2 size={14} />
+                        </button>
+                    </div>
+
+                    <div>
+                        <h3 className={`font-serif font-bold text-xl leading-tight mb-2 line-clamp-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                             {doc.title}
                         </h3>
-                        <p className="text-xs text-gray-400">Edited {doc.updated}</p>
-                     </div>
-                 </div>
-
-                 <div className="space-y-4">
-                     <div className="flex items-center justify-between">
-                         <div className="flex -space-x-2">
-                            <div className="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[10px] text-indigo-700 font-bold">
-                                {doc.author[0]}
-                            </div>
-                         </div>
-                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColor}`}>
-                            {doc.status}
-                         </span>
-                     </div>
-
-                     <div>
-                         <div className="flex justify-between text-[10px] text-gray-400 mb-1.5">
-                             <span>Audit Readiness</span>
-                             <span className="font-medium text-gray-600">{doc.score}%</span>
-                         </div>
-                         <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                             <div 
-                                className={`h-full rounded-full ${doc.score > 80 ? 'bg-emerald-500' : 'bg-indigo-500'}`} 
-                                style={{ width: `${doc.score}%` }} 
-                             />
-                         </div>
-                     </div>
-                 </div>
+                        <p className={`text-xs font-medium uppercase tracking-wider opacity-60 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            {doc.updated}
+                        </p>
+                    </div>
+                </div>
             </div>
+
+            {/* Shadow underneath */}
+            <div className="absolute -bottom-4 left-4 right-4 h-4 bg-black/20 blur-xl rounded-full opacity-60 group-hover:opacity-40 transition-opacity"></div>
         </motion.div>
     );
 };
@@ -404,15 +378,15 @@ const CreateModal = ({ onClose, onCreate, title, setTitle, color, setColor, colo
         <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
         />
         <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden relative z-10 border border-gray-100"
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative z-10"
         >
             <div className="p-8">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-serif font-bold text-gray-900">New Policy</h2>
+                    <h2 className="text-2xl font-serif font-bold text-gray-900">New Book</h2>
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
                         <X size={20} />
                     </button>
@@ -420,28 +394,28 @@ const CreateModal = ({ onClose, onCreate, title, setTitle, color, setColor, colo
                 
                 <div className="space-y-6">
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Document Title</label>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Title</label>
                         <input 
                             type="text" 
                             value={title} 
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="e.g. Data Retention Policy 2026"
-                            className="w-full text-lg bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                            placeholder="e.g. Employee Handbook 2026"
+                            className="w-full text-lg bg-gray-50 border-b-2 border-gray-200 focus:border-black px-4 py-3 transition-all outline-none"
                             autoFocus
                         />
                     </div>
                     
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Cover Color</label>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Cover Style</label>
                         <div className="flex flex-wrap gap-3">
                             {colors.map((c: any) => (
                                 <button
                                     key={c.value}
                                     onClick={() => setColor(c.value)}
-                                    className={`w-10 h-10 rounded-full border-2 transition-all hover:scale-110 ${color === c.value ? 'border-gray-900 scale-110 shadow-md' : 'border-transparent'} ${c.bg}`}
+                                    className={`w-10 h-10 rounded-full border-2 transition-all hover:scale-110 ${color === c.value ? 'border-black scale-110 shadow-md' : 'border-transparent'} ${c.bg}`}
                                     title={c.label}
                                 >
-                                    {color === c.value && <Check size={16} className="text-white mx-auto" />}
+                                    {color === c.value && <Check size={16} className={['#ffffff', '#f3f3f3', '#efefef'].includes(c.value) ? 'text-black' : 'text-white'} style={{margin: '0 auto'}} />}
                                 </button>
                             ))}
                         </div>
@@ -449,22 +423,16 @@ const CreateModal = ({ onClose, onCreate, title, setTitle, color, setColor, colo
                 </div>
 
                 <div className="mt-10 flex gap-3">
-                    <button onClick={onClose} className="flex-1 px-4 py-3.5 text-gray-600 font-medium hover:bg-gray-50 rounded-xl transition-colors">
-                        Cancel
-                    </button>
                     <button 
                         onClick={onCreate} 
                         disabled={!title.trim()}
-                        className="flex-1 px-6 py-3.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full px-6 py-4 bg-black text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        <span>Create Document</span>
+                        <span>Create</span>
                         <ArrowRight size={16} />
                     </button>
                 </div>
             </div>
-            
-            {/* Visual Decorative Strip */}
-            <div className="h-2 w-full" style={{ backgroundColor: color }} />
         </motion.div>
     </div>
 );

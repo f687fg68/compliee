@@ -562,20 +562,27 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser 
                     exit={{ opacity: 0, y: 20, scale: 0.95, translateX: "-50%" }} 
                     className="fixed bottom-8 left-1/2 w-[90%] md:w-[600px] z-50 origin-bottom"
                 >
-                    <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.2)] border border-white/60 overflow-hidden ring-1 ring-black/5">
-                        <div className="p-4 border-b border-gray-100/50 flex justify-between items-center">
+                    <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.2)] border border-white/60 overflow-hidden ring-1 ring-black/5">
+                        <div className="p-4 border-b border-gray-100/50 flex justify-between items-center bg-gray-50/50">
                             <div className="flex items-center gap-2">
                                 <Wand2 size={16} className="text-indigo-600" />
-                                <span className="text-sm font-bold text-gray-800">Compliee Assistant</span>
+                                <span className="text-sm font-bold text-gray-900">Compliee Assistant</span>
                             </div>
-                            <button onClick={() => setIsAiChatOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={16}/></button>
+                            <button onClick={() => setIsAiChatOpen(false)} className="text-gray-400 hover:text-gray-900"><X size={16}/></button>
                         </div>
                         <div className="p-4">
                              <div className="relative bg-white rounded-2xl border border-gray-200 focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-100 transition-all shadow-inner">
                                 {attachedFile && (
                                     <div className="px-4 pt-3 flex"><div className="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded-md flex items-center gap-2 border border-indigo-100"><Paperclip size={12} /><span className="max-w-[200px] truncate">{attachedFile.name}</span><button onClick={() => setAttachedFile(null)} className="hover:text-indigo-900"><X size={12}/></button></div></div>
                                 )}
-                                <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAiChatSubmit()} placeholder="Ask Compliee to draft a policy, check regulations, or read attached files..." className="w-full bg-transparent p-4 pb-12 text-sm outline-none resize-none h-32 text-gray-700 placeholder:text-gray-400 font-medium" autoFocus />
+                                <textarea 
+                                    value={aiPrompt} 
+                                    onChange={(e) => setAiPrompt(e.target.value)} 
+                                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAiChatSubmit()} 
+                                    placeholder="Ask Compliee to draft a policy, check regulations, or read attached files..." 
+                                    className="w-full bg-transparent p-4 pb-12 text-sm outline-none resize-none h-32 text-black placeholder:text-gray-600 font-medium" 
+                                    autoFocus 
+                                />
                                 <div className="absolute bottom-2 left-2 flex gap-2"><button onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors"><Paperclip size={18} /></button></div>
                                 <button onClick={handleAiChatSubmit} disabled={!aiPrompt.trim() && !attachedFile} className="absolute bottom-3 right-3 p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"><ArrowUp size={16} /></button>
                              </div>
@@ -637,5 +644,5 @@ const ColorSwatch = ({ color, active, onClick }: any) => (
     </button>
 );
 const QuickPrompt = ({ label, onClick }: any) => (
-    <button onClick={onClick} className="px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap">{label}</button>
+    <button onClick={onClick} className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-black border border-gray-300 text-xs rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap">{label}</button>
 );
