@@ -9,9 +9,10 @@ interface PricingPageProps {
   onBack: () => void;
   currentUser?: any;
   onPlanSelected?: () => void;
+  onSubscriptionComplete?: () => void;
 }
 
-export const PricingPage = ({ onBack, currentUser, onPlanSelected }: PricingPageProps) => {
+export const PricingPage = ({ onBack, currentUser, onPlanSelected, onSubscriptionComplete }: PricingPageProps) => {
   const [processingPlan, setProcessingPlan] = useState<'monthly' | 'yearly' | null>(null);
 
   const containerVariants = {
@@ -34,20 +35,21 @@ export const PricingPage = ({ onBack, currentUser, onPlanSelected }: PricingPage
       }
 
       setProcessingPlan(plan);
+      
+      const link = plan === 'monthly' 
+        ? 'https://buy.polar.sh/polar_cl_Uh8zbq3LZ6UbLm07xffigIB4mUDK5ayn85UmS2NkSYU'
+        : 'https://buy.polar.sh/polar_cl_tsxMyr2PWeL3VkWSbxgmG0acWHGE52fjCLhsE1QO4qI';
 
-      try {
-          // Direct redirect to payment provider.
-          // The application checks for ?success=true in the URL on return to verify/activate.
-          if (plan === 'monthly') {
-              window.location.href = "https://buy.polar.sh/polar_cl_Uh8zbq3LZ6UbLm07xffigIB4mUDK5ayn85UmS2NkSYU";
-          } else if (plan === 'yearly') {
-              window.location.href = "https://buy.polar.sh/polar_cl_tsxMyr2PWeL3VkWSbxgmG0acWHGE52fjCLhsE1QO4qI";
-          }
-      } catch (e) {
-          console.error("Payment initiation failed", e);
-          alert("Could not connect to payment provider.");
-          setProcessingPlan(null);
-      }
+      // Open payment link
+      window.open(link, '_blank');
+
+      // Stop processing spinner after a delay to allow popup
+      setTimeout(() => {
+         setProcessingPlan(null);
+      }, 1000);
+
+      // Note: We no longer auto-grant subscription here.
+      // Subscription status must be updated via webhooks or manual verification in a real scenario.
   };
 
   return (

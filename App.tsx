@@ -21,42 +21,35 @@ declare const puter: any;
 
 type ViewState = 'landing' | 'dashboard' | 'editor' | 'features' | 'help' | 'pricing' | 'privacy' | 'terms' | 'security' | 'login';
 
-export const SUBSCRIPTION_FILE = 'compliee_pro_v1.json';
-
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>('landing');
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+  const [initialAiPrompt, setInitialAiPrompt] = useState<string>(''); 
   const [user, setUser] = useState<any>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   useEffect(() => {
-    // Initial Auth Check with Library Wait Logic
     const checkAuth = async () => {
-      // 1. Wait for Puter.js to load (Crucial for Vercel/Production)
       let attempts = 0;
       while (typeof (window as any).puter === 'undefined' && attempts < 50) {
           await new Promise(resolve => setTimeout(resolve, 100));
           attempts++;
       }
 
-      // 2. If still not loaded, stop checking but don't crash
       if (typeof (window as any).puter === 'undefined') {
-          console.error("Puter.js failed to initialize. Please check your internet connection.");
+          console.error("Puter.js failed to initialize.");
           setIsAuthChecking(false);
           return;
       }
 
-      // 3. Safe to use puter now
       try {
         if (puter.auth.isSignedIn()) {
           const userData = await puter.auth.getUser();
           setUser(userData);
-          
-          // Check for payment callback
-          const urlParams = new URLSearchParams(window.location.search);
-          if (urlParams.get('success') === 'true') {
-             await handlePaymentSuccess();
-          }
+          // Check subscription status from KV store
+          const status = await puter.kv.get(`sub_${userData.username}`);
+          setIsSubscribed(status === 'active');
         }
       } catch (e) {
         console.log("Not signed in or auth error", e);
@@ -67,60 +60,82 @@ export default function App() {
     checkAuth();
   }, []);
 
-  const handlePaymentSuccess = async () => {
-      try {
-          await puter.fs.write(SUBSCRIPTION_FILE, JSON.stringify({ 
-              status: 'active', 
-              since: new Date().toISOString() 
-          }));
-          // Clean URL
-          window.history.replaceState({}, document.title, "/");
-          alert("Subscription activated successfully! Welcome to Pro.");
-          setCurrentView('dashboard');
-      } catch (e) {
-          console.error("Failed to activate subscription", e);
-      }
-  };
-
   const handleLoginSuccess = async (userData: any) => {
     setUser(userData);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Check payment on login success too if params exist
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('success') === 'true') {
-         await puter.fs.write(SUBSCRIPTION_FILE, JSON.stringify({ 
-              status: 'active', 
-              since: new Date().toISOString() 
-          }));
-         window.history.replaceState({}, document.title, "/");
-    }
+    // Check subscription after login
+    const status = await puter.kv.get(`sub_${userData.username}`);
+    const isActive = status === 'active';
+    setIsSubscribed(isActive);
 
-    setCurrentView('dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Routing Logic
+    if (!isActive) {
+        setCurrentView('pricing'); // Enforce subscription immediately after login
+    } else if (initialAiPrompt) {
+        // If they had a pending prompt from Hero
+        setSelectedFilePath(null);
+        setCurrentView('editor');
+    } else {
+        setCurrentView('dashboard');
+    }
+  };
+
+  const handleSubscriptionSuccess = async () => {
+      if (user) {
+          // Simulate backend webhook by setting KV flag
+          await puter.kv.set(`sub_${user.username}`, 'active');
+          setIsSubscribed(true);
+          
+          if (initialAiPrompt) {
+              setCurrentView('editor');
+          } else {
+              setCurrentView('dashboard');
+          }
+      }
   };
 
   const handleLogout = async () => {
     try {
         await puter.auth.signOut();
     } catch (e) {
-        console.log("Sign out error (ignoring for guest)", e);
+        console.log("Sign out error", e);
     }
     setUser(null);
+    setIsSubscribed(false);
     setCurrentView('landing');
   };
 
-  const handleStart = async () => {
-    if (user) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setCurrentView('dashboard');
+  const handleStart = async (prompt?: string) => {
+    if (prompt) setInitialAiPrompt(prompt);
+
+    if (!user) {
+        // Must sign in first
+        setCurrentView('login');
+    } else if (!isSubscribed) {
+        // Must subscribe
+        setCurrentView('pricing');
     } else {
-      setCurrentView('login');
+        // All good
+        if (prompt) {
+            setSelectedFilePath(null);
+            setCurrentView('editor');
+        } else {
+            setCurrentView('dashboard');
+        }
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenEditor = (filePath?: string) => {
+    if (!isSubscribed) {
+        setCurrentView('pricing');
+        return;
+    }
+    setInitialAiPrompt(''); 
     if (filePath) setSelectedFilePath(filePath);
-    else setSelectedFilePath(null); // New file
+    else setSelectedFilePath(null);
     setCurrentView('editor');
   };
 
@@ -134,14 +149,13 @@ export default function App() {
        <div className="h-screen w-full flex items-center justify-center bg-gray-50">
           <div className="flex flex-col items-center gap-4 text-indigo-600">
              <Loader2 size={40} className="animate-spin" />
-             <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
           </div>
        </div>
      );
   }
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden selection:bg-blue-200 selection:text-blue-900 bg-gray-50 text-gray-900">
+    <div className="min-h-screen w-full overflow-x-hidden selection:bg-indigo-100 selection:text-indigo-900 bg-[#FAFAFA] text-gray-900">
       <AnimatePresence mode="wait">
         
         {currentView === 'login' && (
@@ -159,96 +173,40 @@ export default function App() {
            </motion.div>
         )}
 
-        {currentView === 'terms' && (
-           <motion.div 
-             key="terms"
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             exit={{ opacity: 0, y: -20 }}
-             transition={{ duration: 0.4 }}
-           >
-             <TermsOfServicePage onBack={() => navigateToView('landing')} />
-           </motion.div>
-        )}
-
-        {currentView === 'privacy' && (
-           <motion.div 
-             key="privacy"
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             exit={{ opacity: 0, y: -20 }}
-             transition={{ duration: 0.4 }}
-           >
-             <PrivacyPolicyPage onBack={() => navigateToView('landing')} />
-           </motion.div>
-        )}
-        
-        {currentView === 'security' && (
-           <motion.div 
-             key="security"
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             exit={{ opacity: 0, y: -20 }}
-             transition={{ duration: 0.4 }}
-           >
-             <SecurityPage onBack={() => navigateToView('landing')} />
-           </motion.div>
-        )}
-
-        {currentView === 'pricing' && (
-           <motion.div 
-             key="pricing"
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             exit={{ opacity: 0, y: -20 }}
-             transition={{ duration: 0.4 }}
-           >
-             <PricingPage 
-                onBack={() => navigateToView(user ? 'dashboard' : 'landing')} 
-                currentUser={user}
-                onPlanSelected={() => navigateToView('dashboard')}
-             />
-           </motion.div>
-        )}
-
-        {currentView === 'help' && (
-           <motion.div 
-             key="help"
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             exit={{ opacity: 0, y: -20 }}
-             transition={{ duration: 0.4 }}
-           >
-             <HelpPage onBack={() => navigateToView(user ? 'dashboard' : 'landing')} />
-           </motion.div>
-        )}
-
-        {currentView === 'features' && (
-           <motion.div 
-             key="features"
-             initial={{ opacity: 0, x: 20 }}
-             animate={{ opacity: 1, x: 0 }}
-             exit={{ opacity: 0, x: -20 }}
-             transition={{ duration: 0.4 }}
-           >
-             <FeaturesPage onBack={() => navigateToView('landing')} />
-           </motion.div>
+        {/* ... (Other static pages like terms, privacy etc remain same logic) ... */}
+        {['terms', 'privacy', 'security', 'pricing', 'help', 'features'].includes(currentView) && (
+             <motion.div key={currentView} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {currentView === 'terms' && <TermsOfServicePage onBack={() => navigateToView('landing')} />}
+                {currentView === 'privacy' && <PrivacyPolicyPage onBack={() => navigateToView('landing')} />}
+                {currentView === 'security' && <SecurityPage onBack={() => navigateToView('landing')} />}
+                {currentView === 'pricing' && (
+                    <PricingPage 
+                        onBack={() => navigateToView(user ? (isSubscribed ? 'dashboard' : 'landing') : 'landing')} 
+                        currentUser={user} 
+                        onSubscriptionComplete={handleSubscriptionSuccess}
+                    />
+                )}
+                {currentView === 'help' && <HelpPage onBack={() => navigateToView(user ? 'dashboard' : 'landing')} />}
+                {currentView === 'features' && <FeaturesPage onBack={() => navigateToView('landing')} />}
+             </motion.div>
         )}
 
         {currentView === 'editor' && (
            <motion.div 
              key="editor"
-             initial={{ opacity: 0, scale: 0.98 }}
-             animate={{ opacity: 1, scale: 1 }}
-             exit={{ opacity: 0, scale: 1.02 }}
-             transition={{ duration: 0.4 }}
-             className="h-screen overflow-hidden"
+             initial={{ opacity: 0, scale: 0.95, y: 20 }}
+             animate={{ opacity: 1, scale: 1, y: 0 }}
+             exit={{ opacity: 0, scale: 1.05 }}
+             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} 
+             className="h-screen overflow-hidden bg-[#F3F4F6]"
            >
              <EditorPage 
                 filePath={selectedFilePath} 
                 onBack={() => navigateToView('dashboard')} 
                 onNavigateToPricing={() => navigateToView('pricing')}
                 currentUser={user}
+                isSubscribed={isSubscribed}
+                initialPrompt={initialAiPrompt} 
              />
            </motion.div>
         )}
@@ -256,10 +214,9 @@ export default function App() {
         {currentView === 'dashboard' && (
           <motion.div 
             key="dashboard"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="h-screen overflow-hidden"
           >
             <LibraryDashboard 
@@ -268,6 +225,7 @@ export default function App() {
                 onNavigateToPricing={() => navigateToView('pricing')}
                 onLogout={handleLogout}
                 currentUser={user}
+                isSubscribed={isSubscribed}
             />
           </motion.div>
         )}
@@ -275,17 +233,18 @@ export default function App() {
         {currentView === 'landing' && (
           <motion.div
             key="landing"
-            exit={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.5 }}
           >
             <Navbar 
-              onStartWriting={handleStart} 
+              onStartWriting={() => handleStart()} 
               onLogin={() => navigateToView('login')}
               onLogout={handleLogout}
               onNavigateToFeatures={() => navigateToView('features')}
               onNavigateToHelp={() => navigateToView('help')}
               onNavigateToPricing={() => navigateToView('pricing')}
               user={user}
+              isSubscribed={isSubscribed}
             />
             <HeroSection onStartWriting={handleStart} />
             <FeaturesGrid />
