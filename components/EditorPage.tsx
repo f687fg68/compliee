@@ -59,7 +59,7 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser,
       }
   }, [isSubscribed]);
 
-  // Initial Load
+  // Initial Load & AI Orchestration Trigger
   useEffect(() => {
     const init = async () => {
         if (!isSubscribed) return; // Prevent init if not subscribed
@@ -70,13 +70,13 @@ export const EditorPage = ({ onBack, onNavigateToPricing, filePath, currentUser,
         if (filePath) {
             loadDocument(filePath);
         } else if (initialPrompt) {
-            // MAGIC TRANSITION: If coming from landing page with a prompt
-            setDocTitle(initialPrompt.length > 30 ? initialPrompt.slice(0, 30) + "..." : initialPrompt);
+            // ORCHESTRATION: If passing from Landing Page
+            setDocTitle(initialPrompt.length > 40 ? initialPrompt.slice(0, 40) + "..." : initialPrompt);
             setAiPrompt(initialPrompt);
-            setIsAiChatOpen(true);
+            // Small delay to allow UI to mount before showing the agent swarm
             setTimeout(() => {
-                handleAiChatSubmit(initialPrompt); // Auto submit
-            }, 800);
+                handleAiChatSubmit(initialPrompt); 
+            }, 500);
         }
     };
     init();

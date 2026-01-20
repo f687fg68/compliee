@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Sparkles, ChevronDown, Wand2, Shield, Lock, FileText, CheckCircle, Search, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, Shield } from 'lucide-react';
 
 interface HeroSectionProps {
   onStartWriting?: (prompt?: string) => void;
@@ -11,178 +11,173 @@ export const HeroSection = ({ onStartWriting }: HeroSectionProps) => {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 200]);
   const y2 = useTransform(scrollY, [0, 500], [0, -150]);
-  const rotate1 = useTransform(scrollY, [0, 500], [-6, -12]);
-  const rotate2 = useTransform(scrollY, [0, 500], [6, 12]);
+  const opacity = useTransform(scrollY, [0, 400], [1, 0]);
   
   const [inputValue, setInputValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleInputSubmit = () => {
-      if (onStartWriting) {
+      if (onStartWriting && inputValue.trim()) {
           onStartWriting(inputValue);
       }
   };
 
   return (
-    <div className="relative w-full min-h-[110vh] bg-[#FAFAFA] overflow-hidden">
+    <div className="relative w-full min-h-[110vh] bg-[#FAFAFA] overflow-hidden selection:bg-indigo-100 selection:text-indigo-900">
       
-      {/* Background Gradients - Smoother and more subtle */}
-      <div className="absolute inset-0 z-0">
-         <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-indigo-100/40 rounded-full blur-[120px] mix-blend-multiply animate-pulse" />
-         <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-blue-100/40 rounded-full blur-[100px] mix-blend-multiply animate-pulse" style={{ animationDelay: "2s" }} />
-         <div className="absolute bottom-[20%] left-[20%] w-[50vw] h-[50vw] bg-purple-50/40 rounded-full blur-[120px] mix-blend-multiply" />
-      </div>
+      {/* Dynamic Noise Overlay */}
+      <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
-      <div className="container mx-auto px-4 relative z-10 flex flex-col items-center pt-48">
+      {/* Organic Aurora Background */}
+      <motion.div style={{ opacity }} className="absolute inset-0 z-0">
+         <div className="absolute top-[-10%] left-[10%] w-[70vw] h-[70vw] bg-gradient-to-r from-indigo-200/40 to-purple-200/40 rounded-full blur-[120px] mix-blend-multiply animate-blob" />
+         <div className="absolute top-[20%] right-[-10%] w-[60vw] h-[60vw] bg-gradient-to-l from-blue-200/40 to-cyan-200/40 rounded-full blur-[100px] mix-blend-multiply animate-blob animation-delay-2000" />
+         <div className="absolute bottom-[-10%] left-[30%] w-[60vw] h-[60vw] bg-gradient-to-t from-emerald-100/40 to-teal-100/40 rounded-full blur-[100px] mix-blend-multiply animate-blob animation-delay-4000" />
+      </motion.div>
+
+      <div className="container mx-auto px-4 relative z-10 flex flex-col items-center pt-32 md:pt-48">
         
-        {/* Floating Badge */}
+        {/* Product Badge */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="group cursor-pointer flex items-center gap-2 mb-10 bg-white/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/60 shadow-lg shadow-indigo-500/5 hover:bg-white/80 transition-all ring-1 ring-black/5"
+          transition={{ duration: 0.5 }}
+          className="mb-8 group cursor-pointer"
         >
-          <span className="flex items-center justify-center w-5 h-5 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full text-white shadow-inner">
-            <Shield size={10} />
-          </span>
-          <span className="text-gray-600 font-medium text-xs tracking-wide">Compliee 2.0 <span className="text-gray-400 mx-1">|</span> SOC 2 Ready</span>
-          <ChevronDown size={12} className="text-gray-400 group-hover:translate-y-0.5 transition-transform" />
+          <div className="flex items-center gap-2 bg-white/60 backdrop-blur-xl px-4 py-1.5 rounded-full border border-gray-200/60 shadow-sm hover:shadow-md transition-all hover:scale-105 hover:bg-white/80">
+             <div className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+             </div>
+             <span className="text-[11px] font-bold text-gray-600 uppercase tracking-widest">Compliee 2.0</span>
+          </div>
         </motion.div>
 
         {/* Main Title */}
-        <motion.h1 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-5xl md:text-7xl lg:text-8xl text-center font-serif leading-[0.95] text-gray-900 tracking-tighter mb-8 relative"
-        >
-          <span className="relative inline-block z-10">Compliance writing</span>
-          <br/>
-          <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-b from-indigo-600 to-blue-800 z-10 pb-4">
-             reimagined.
-          </span>
-        </motion.h1>
-
-        <motion.p 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-gray-500 text-xl md:text-2xl text-center max-w-xl font-light leading-relaxed mb-16"
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-center mb-10"
         >
-          The intelligent operating system that automates policy drafting, maps controls, and tracks regulatory changes for modern enterprises.
-        </motion.p>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif leading-[0.95] text-gray-900 tracking-tight mb-4">
+              Compliance writing,
+            </h1>
+            <div className="relative inline-block">
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif leading-[0.95] text-transparent bg-clip-text bg-gradient-to-r from-gray-400 via-gray-600 to-gray-400 bg-[length:200%_auto] animate-shimmer">
+                  perfected by AI.
+                </h1>
+            </div>
+        </motion.div>
 
-        {/* Hero Interactive Input */}
+        {/* --- ORCHESTRATION INPUT AREA --- */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="w-full max-w-2xl relative z-20 group"
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="w-full max-w-2xl relative z-30 mt-4 mb-16"
         >
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400 rounded-3xl opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-500 animate-gradient-x"></div>
-          <div className="relative glass-panel bg-white rounded-2xl p-2 shadow-2xl shadow-indigo-900/5 backdrop-blur-xl border border-gray-100 ring-4 ring-white/50">
-             <div className="flex flex-col md:flex-row gap-2">
-                <div className="flex-1 relative">
-                    <Sparkles className="absolute top-1/2 -translate-y-1/2 left-5 text-indigo-500 animate-pulse" size={20} />
-                    <input 
-                      type="text" 
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleInputSubmit()}
-                      placeholder="Draft a Data Retention Policy for GDPR..." 
-                      className="w-full h-full min-h-[64px] pl-14 pr-4 bg-transparent outline-none text-lg text-gray-800 placeholder:text-gray-400 font-serif"
-                    />
+          {/* Main Input Container */}
+          <div 
+            className={`
+              relative bg-white/80 backdrop-blur-xl rounded-[2rem] p-2 transition-all duration-500
+              ${isFocused 
+                ? 'shadow-[0_20px_60px_-15px_rgba(79,70,229,0.2)] ring-1 ring-indigo-500/20 scale-[1.02]' 
+                : 'shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] hover:shadow-xl ring-1 ring-black/5'
+              }
+            `}
+          >
+             <div className="flex items-center pl-6 pr-2 h-16 md:h-20">
+                
+                {/* AI Icon */}
+                <div className={`mr-5 transition-colors duration-500 ${isFocused ? 'text-indigo-600' : 'text-gray-400'}`}>
+                    <Sparkles size={24} className={inputValue ? "animate-pulse" : ""} strokeWidth={1.5} />
                 </div>
+
+                {/* Text Input */}
+                <input 
+                  type="text" 
+                  value={inputValue}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleInputSubmit()}
+                  placeholder="Draft a Data Retention Policy for GDPR..." 
+                  className="flex-1 h-full bg-transparent outline-none text-xl md:text-2xl text-gray-900 placeholder:text-gray-300 font-medium font-sans tracking-tight"
+                />
+
+                {/* Action Button */}
                 <button 
                    onClick={handleInputSubmit}
-                   className="bg-[#111] hover:bg-black text-white px-8 py-4 rounded-xl font-medium transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group/btn active:scale-95"
+                   className={`
+                     h-12 md:h-14 px-6 md:px-8 rounded-[1.2rem] font-bold text-sm md:text-base transition-all duration-500 flex items-center gap-2 group overflow-hidden relative
+                     ${inputValue.trim() 
+                        ? 'bg-gray-900 text-white shadow-lg hover:shadow-xl hover:scale-105 translate-x-0 opacity-100 w-auto' 
+                        : 'bg-gray-100 text-gray-400 w-0 px-0 opacity-0 pointer-events-none'
+                     }
+                   `}
                 >
-                   <span>{inputValue.length > 0 ? 'Generate' : 'Start Drafting'}</span>
-                   {inputValue.length > 0 ? <Wand2 size={16} className="animate-pulse"/> : <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform"/>}
+                   <span className="whitespace-nowrap relative z-10">Start</span>
+                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform relative z-10"/>
+                   
+                   {/* Button Shine Effect */}
+                   <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent z-0"></div>
                 </button>
              </div>
-             
-             {/* Micro-interaction tags */}
-             <div className="hidden md:flex flex-wrap gap-2 px-4 pb-2 pt-2">
-                <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold py-1">Try:</span>
-                {['SOC 2 Type II', 'ISO 27001', 'HIPAA', 'GDPR'].map(tag => (
-                    <button 
-                        key={tag} 
-                        onClick={() => { setInputValue(`Draft a policy for ${tag}...`); }}
-                        className="text-xs text-gray-500 bg-gray-50 hover:bg-indigo-50 hover:text-indigo-600 px-2 py-1 rounded-md border border-transparent hover:border-indigo-100 transition-colors"
-                    >
-                        {tag}
-                    </button>
-                ))}
-             </div>
           </div>
+
+          {/* Quick Start Tags */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mt-8"
+          >
+             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-2">Or try:</span>
+             {['SOC 2 Type II', 'ISO 27001', 'HIPAA', 'GDPR', 'Handbook'].map((tag, i) => (
+                <button 
+                  key={tag}
+                  onClick={() => setInputValue(`Draft a comprehensive ${tag} policy document...`)}
+                  className="px-4 py-2 rounded-xl bg-white/60 border border-gray-200/60 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:border-indigo-200 hover:bg-white transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  {tag}
+                </button>
+             ))}
+          </motion.div>
         </motion.div>
 
-        {/* Floating Element Left */}
+
+        {/* Floating Abstract Cards (Decorative) */}
         <motion.div 
-          style={{ y: y1, rotate: rotate1 }}
-          className="absolute top-1/3 left-[5%] xl:left-[10%] hidden lg:block"
+          style={{ y: y1 }}
+          className="absolute top-[40%] left-[5%] xl:left-[12%] hidden lg:block -z-10"
         >
-          <div className="w-64 bg-white/80 backdrop-blur-xl p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white ring-1 ring-gray-100 transition-transform hover:scale-105 duration-300">
-             <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-green-50 border border-green-100 flex items-center justify-center">
-                   <Shield size={20} className="text-green-600" />
-                </div>
-                <div>
-                   <h4 className="font-bold text-gray-800 text-sm">Security Audit</h4>
-                   <p className="text-[10px] text-green-700 font-bold bg-green-50 px-2 py-0.5 rounded-full inline-block mt-0.5 border border-green-100">PASSED</p>
-                </div>
-             </div>
-             <div className="space-y-2">
-                <div className="flex justify-between items-center text-xs text-gray-500">
-                    <span>Control Coverage</span>
-                    <span className="font-bold text-gray-900">94%</span>
-                </div>
-                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full w-[94%] bg-green-500 rounded-full" />
-                </div>
-             </div>
-          </div>
+           <div className="bg-white/40 backdrop-blur-md border border-white/50 p-6 rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] rotate-[-6deg] hover:rotate-0 transition-transform duration-700">
+              <Shield size={32} className="text-indigo-600 mb-4 drop-shadow-sm" />
+              <div className="w-24 h-2 bg-gray-200/80 rounded-full mb-2"></div>
+              <div className="w-16 h-2 bg-gray-200/80 rounded-full"></div>
+           </div>
         </motion.div>
 
-        {/* Floating Element Right */}
         <motion.div 
-          style={{ y: y2, rotate: rotate2 }}
-          className="absolute top-1/4 right-[5%] xl:right-[10%] hidden lg:block"
+          style={{ y: y2 }}
+          className="absolute top-[35%] right-[5%] xl:right-[12%] hidden lg:block -z-10"
         >
-          <div className="w-60 bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,255,0.1)] p-6 border border-white ring-1 ring-gray-100 relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
-             <div className="flex justify-between items-center mb-4">
-                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Policy</span>
-                 <div className="flex items-center gap-1 text-[10px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full font-bold">
-                    <Lock size={8} /> Confidential
-                 </div>
-             </div>
-             
-             <div className="space-y-3 mb-4 opacity-50">
-                 <div className="w-full h-2 bg-gray-100 rounded-full" />
-                 <div className="w-full h-2 bg-gray-100 rounded-full" />
-                 <div className="w-2/3 h-2 bg-gray-100 rounded-full" />
-             </div>
-
-             <div className="flex items-center gap-3 p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-400">
-                    <FileText size={14} />
-                </div>
-                <div>
-                    <div className="text-xs font-bold text-gray-700">Access Control</div>
-                    <div className="text-[10px] text-gray-400">ISO 27001 • A.9</div>
-                </div>
-                <div className="ml-auto text-green-500">
-                    <CheckCircle size={14} />
-                </div>
-             </div>
-          </div>
+           <div className="bg-white/40 backdrop-blur-md border border-white/50 p-6 rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] rotate-[6deg] hover:rotate-0 transition-transform duration-700">
+              <div className="flex gap-1.5 mb-4">
+                 <div className="w-3 h-3 rounded-full bg-red-400 shadow-sm"></div>
+                 <div className="w-3 h-3 rounded-full bg-amber-400 shadow-sm"></div>
+                 <div className="w-3 h-3 rounded-full bg-emerald-400 shadow-sm"></div>
+              </div>
+              <div className="w-24 h-2 bg-gray-200/80 rounded-full mb-2"></div>
+              <div className="w-32 h-2 bg-gray-200/80 rounded-full"></div>
+           </div>
         </motion.div>
 
       </div>
       
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#FAFAFA] to-transparent z-10" />
+      {/* Smooth Fade at bottom */}
+      <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-[#FAFAFA] to-transparent z-10 pointer-events-none" />
     </div>
   );
 };

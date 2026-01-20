@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Box, Wand2, Shield, AlertCircle, MoreHorizontal } from 'lucide-react';
@@ -9,8 +10,14 @@ export const NotebookDemo = () => {
       <div className="container mx-auto px-4 relative z-10 flex flex-col items-center">
          
          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Audit-ready. <br/> From day one.</h2>
-            <p className="text-gray-500">The interface clears the clutter so you can focus on governance.</p>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+            >
+                <h2 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Audit-ready. <br/> From day one.</h2>
+                <p className="text-gray-500">The interface clears the clutter so you can focus on governance.</p>
+            </motion.div>
          </div>
 
          <motion.div 
@@ -55,7 +62,12 @@ export const NotebookDemo = () => {
                          <div className="mt-auto p-4 bg-gray-100 rounded-xl">
                             <h5 className="text-xs font-bold text-gray-500 uppercase mb-2">Compliance Score</h5>
                             <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden mb-1">
-                                <div className="w-[85%] h-full bg-green-500 rounded-full"></div>
+                                <motion.div 
+                                    initial={{ width: 0 }}
+                                    whileInView={{ width: "85%" }}
+                                    transition={{ duration: 1.5, delay: 0.5 }}
+                                    className="h-full bg-green-500 rounded-full"
+                                ></motion.div>
                             </div>
                             <div className="flex justify-between text-[10px] text-gray-400">
                                 <span>85/100</span>
@@ -92,24 +104,34 @@ export const NotebookDemo = () => {
                                  
                                  {/* Interactive AI Highlight */}
                                  <div className="relative group cursor-pointer my-8">
-                                    <div className="absolute -inset-2 bg-amber-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <motion.div 
+                                        initial={{ opacity: 0 }}
+                                        whileInView={{ opacity: 1 }}
+                                        transition={{ delay: 1 }}
+                                        className="absolute -inset-2 bg-amber-50 rounded-lg"
+                                    ></motion.div>
                                     <div className="relative border-l-2 border-amber-400 pl-4 py-1">
                                         <p className="text-gray-800">
                                             Exceptions to this document may be granted by the Chief Information Security Officer (CISO) on a case-by-case basis.
                                         </p>
                                         
                                         {/* Floating AI Action */}
-                                        <div className="absolute -right-32 top-0 bg-white shadow-xl rounded-lg p-3 w-48 border border-gray-100 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0 z-20">
+                                        <motion.div 
+                                            initial={{ opacity: 0, x: 20, rotateX: 20 }}
+                                            whileInView={{ opacity: 1, x: 0, rotateX: 0 }}
+                                            transition={{ delay: 1.5, type: "spring" }}
+                                            className="absolute -right-32 top-0 bg-white shadow-xl rounded-lg p-3 w-48 border border-gray-100 z-20"
+                                        >
                                             <div className="flex items-center gap-2 mb-2 text-xs text-amber-600 font-bold">
                                                 <AlertCircle size={12}/> Risk Flag
                                             </div>
                                             <p className="text-[10px] text-gray-500 leading-relaxed mb-2">
                                                 Granting exceptions without a defined expiration date creates indefinite liability under GDPR Art 5(1)(e).
                                             </p>
-                                            <button className="w-full bg-amber-50 text-amber-700 text-[10px] font-medium py-1 rounded hover:bg-amber-100">
+                                            <button className="w-full bg-amber-50 text-amber-700 text-[10px] font-medium py-1 rounded hover:bg-amber-100 animate-pulse">
                                                 Auto-Remediate
                                             </button>
-                                        </div>
+                                        </motion.div>
                                     </div>
                                  </div>
 

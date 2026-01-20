@@ -108,22 +108,27 @@ export default function App() {
   };
 
   const handleStart = async (prompt?: string) => {
+    // 1. Capture the prompt
     if (prompt) setInitialAiPrompt(prompt);
 
+    // 2. Check Auth
     if (!user) {
-        // Must sign in first
         setCurrentView('login');
-    } else if (!isSubscribed) {
-        // Must subscribe
+        return;
+    } 
+    
+    // 3. Check Subscription (Strict)
+    if (!isSubscribed) {
         setCurrentView('pricing');
+        return;
+    } 
+    
+    // 4. Proceed to Editor or Dashboard
+    if (prompt) {
+        setSelectedFilePath(null);
+        setCurrentView('editor');
     } else {
-        // All good
-        if (prompt) {
-            setSelectedFilePath(null);
-            setCurrentView('editor');
-        } else {
-            setCurrentView('dashboard');
-        }
+        setCurrentView('dashboard');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
